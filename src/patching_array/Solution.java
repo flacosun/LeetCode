@@ -14,7 +14,7 @@ public class Solution {
                 miss += nums[i++];
             } else {
                 count++;
-                // Break before (miss << 1) > Integer.MAX_VALUE to prevent infinite loop.
+                // Break before (miss << 1) > Integer.MAX_VALUE to prevent from an infinite loop.
                 if (miss > (Integer.MAX_VALUE >> 1)) {
                     break;
                 }
