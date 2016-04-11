@@ -1,4 +1,3 @@
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -6,13 +5,13 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by Xiangqing Sun <xq.sun@uci.edu> on 4/9/2016.
  */
-public class RangeSumQueryTest {
+public class RangeSumQueryMutableTest {
 
-    RangeSumQuery r = new RangeSumQuery();
+    RangeSumQueryMutable r = new RangeSumQueryMutable();
 
     @Test
     public void test() throws Exception {
-        RangeSumQuery.NumArray a = r.new NumArray(new int[]{1, 3, 5});
+        RangeSumQueryMutable.NumArray a = r.new NumArray(new int[]{1, 3, 5});
         assertEquals(9, a.sumRange(0, 2));
         a.update(1, 2);
         assertEquals(8, a.sumRange(0, 2));
@@ -20,6 +19,6 @@ public class RangeSumQueryTest {
 
     @Test
     public void testEmptyArray() throws Exception {
-        RangeSumQuery.NumArray a = r.new NumArray(new int[]{});
+        RangeSumQueryMutable.NumArray a = r.new NumArray(new int[]{});
     }
 }

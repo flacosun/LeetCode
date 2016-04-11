@@ -6,7 +6,7 @@
  * A better solution is using a segment tree.
  * http://www.geeksforgeeks.org/segment-tree-set-1-sum-of-given-range/
  */
-public class RangeSumQuery {
+public class RangeSumQueryMutable {
 
     public class NumArray {
 
