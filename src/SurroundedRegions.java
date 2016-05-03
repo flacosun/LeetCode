@@ -1,55 +1,98 @@
+import java.util.Arrays;
+
 /**
  * 130. Surrounded Regions
  * https://leetcode.com/problems/surrounded-regions/
  * Created by Xiangqing Sun <xq.sun@uci.edu> on 5/1/2016.
  */
 public class SurroundedRegions {
+
     public class Solution {
 
-        int[] unionSet; // union find set
-        boolean[] hasEdgeO; // whether an union has an 'O' which is on the edge of the matrix
+        int m;
+        int n;
+        private int[] ids;
+        // Weight (size) of each union set
+        private int[] sizes;
+        // The id of union set for 'O's on edge
+        private int OOnEdge;
 
         public void solve(char[][] board) {
-            if(board.length == 0 || board[0].length == 0) return;
+            if ((m = board.length) == 0 || (n = board[0].length) == 0) return;
 
-            // init, every char itself is an union
-            int height = board.length, width = board[0].length;
-            unionSet = new int[height * width];
-            hasEdgeO = new boolean[unionSet.length];
-            for(int i = 0;i<unionSet.length; i++) unionSet[i] = i;
-            for(int i = 0;i<hasEdgeO.length; i++){
-                int x = i / width, y = i % width;
-                hasEdgeO[i] = (board[x][y] == 'O' && (x==0 || x==height-1 || y==0 || y==width-1));
+            ids = new int[m * n];
+            sizes = new int[m * n];
+            Arrays.fill(sizes, 1);
+            OOnEdge = -1;
+
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (board[i][j] == 'X') {
+                        continue;
+                    }
+                    int index = i * n + j;
+                    ids[index] = index;
+                    // Nodes on edges
+                    if (i == 0 || j == 0 || i == m - 1 || j == n - 1) {
+                        if (OOnEdge == -1) {
+                            // Set OOnEdge if it has not been set yet
+                            OOnEdge = index;
+                        } else {
+                            // If OOnEdge is already set, unite it with index
+                            unite(OOnEdge, index);
+                        }
+                    }
+                    // Unite node with its upper neighbor
+                    if (i > 0 && board[i - 1][j] == 'O') {
+                        unite(index, index - n);
+                    }
+                    // Unite node with its left neighbor
+                    if (j > 0 && board[i][j - 1] == 'O') {
+                        unite(index, index - 1);
+                    }
+                }
             }
 
-            // iterate the matrix, for each char, union it + its upper char + its right char if they equals to each other
-            for(int i = 0;i<unionSet.length; i++){
-                int x = i / width, y = i % width, up = x - 1, right = y + 1;
-                if(up >= 0 && board[x][y] == board[up][y]) union(i,i-width);
-                if(right < width && board[x][y] == board[x][right]) union(i,i+1);
-            }
-
-            // for each char in the matrix, if it is an 'O' and its union doesn't has an 'edge O', the whole union should be setted as 'X'
-            for(int i = 0;i<unionSet.length; i++){
-                int x = i / width, y = i % width;
-                if(board[x][y] == 'O' && !hasEdgeO[findSet(i)])
-                    board[x][y] = 'X';
+            // Find
+            for (int i = 1; i < m - 1; i++) {
+                for (int j = 1; j < n - 1; j++) {
+                    if (board[i][j] == 'X') {
+                        continue;
+                    }
+                    int index = i * n + j;
+                    if (OOnEdge == -1 || !find(index, OOnEdge)) {
+                        board[i][j] = 'X';
+                    }
+                }
             }
         }
 
-        private void union(int x,int y){
-            int rootX = findSet(x);
-            int rootY = findSet(y);
-            // if there is an union has an 'edge O',the union after merge should be marked too
-            boolean hasEdgeO = this.hasEdgeO[rootX] || this.hasEdgeO[rootY];
-            unionSet[rootX] = rootY;
-            this.hasEdgeO[rootY] = hasEdgeO;
+        private void unite(int a, int b) {
+            int i = findRoot(a);
+            int j = findRoot(b);
+
+            // Weighted quick union
+            if (sizes[i] < sizes[j]) {
+                ids[i] = j;
+                sizes[j] += sizes[i];
+            } else {
+                ids[j] = i;
+                sizes[i] += sizes[j];
+            }
         }
 
-        private int findSet(int x){
-            if(unionSet[x] == x) return x;
-            unionSet[x] = findSet(unionSet[x]);
-            return unionSet[x];
+        private boolean find(int a, int b) {
+            return findRoot(a) == findRoot(b);
+        }
+
+        private int findRoot(int i) {
+            while (i != ids[i]) {
+                // Path compression
+                ids[i] = ids[ids[i]];
+                i = ids[i];
+            }
+
+            return i;
         }
     }
 }
